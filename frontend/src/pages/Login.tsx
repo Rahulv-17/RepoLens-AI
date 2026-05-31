@@ -64,12 +64,8 @@ export function Login() {
           <div className="p-8">
             {/* Logo area */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
-                style={{ background: 'rgba(0,240,255,0.1)', border: '1px solid rgba(0,240,255,0.2)' }}
-              >
-                <span className="material-symbols-outlined text-2xl" style={{ color: '#00f0ff', fontVariationSettings: "'FILL' 1" }}>
-                  account_tree
-                </span>
+              <div className="mb-6 flex justify-center">
+                <img src="/logo.png" alt="RepoLens AI Logo" className="h-10 w-auto object-contain rounded-xl" />
               </div>
               <h1 style={{ fontFamily: 'Geist, sans-serif', fontWeight: 700, fontSize: '22px', letterSpacing: '-0.02em', color: '#dce4e5' }}>
                 Welcome back
@@ -103,20 +99,12 @@ export function Login() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     autoComplete="email"
-                    className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
+                    className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all glow-focus"
                     style={{
                       background: 'rgba(8,15,16,0.8)',
                       border: '1px solid rgba(255,255,255,0.08)',
                       color: '#dce4e5',
                       fontFamily: 'Inter, sans-serif',
-                    }}
-                    onFocus={e => {
-                      e.currentTarget.style.borderColor = 'rgba(0,240,255,0.5)';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,240,255,0.08), inset 0 0 0 1px rgba(0,240,255,0.1)';
-                    }}
-                    onBlur={e => {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   />
                 </div>
@@ -134,21 +122,13 @@ export function Login() {
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    className="w-full rounded-xl px-4 py-3 pr-12 text-sm outline-none transition-all"
+                    className="w-full rounded-xl px-4 py-3 pr-12 text-sm outline-none transition-all glow-focus"
                     style={{
                       background: 'rgba(8,15,16,0.8)',
                       border: '1px solid rgba(255,255,255,0.08)',
                       color: '#dce4e5',
                       fontFamily: "'JetBrains Mono', monospace",
                       letterSpacing: showPassword ? 'normal' : '0.15em',
-                    }}
-                    onFocus={e => {
-                      e.currentTarget.style.borderColor = 'rgba(0,240,255,0.5)';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,240,255,0.08), inset 0 0 0 1px rgba(0,240,255,0.1)';
-                    }}
-                    onBlur={e => {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   />
                   <button

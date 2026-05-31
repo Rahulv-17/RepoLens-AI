@@ -136,10 +136,8 @@ export function LandingPage() {
                   border: '1px solid rgba(255,255,255,0.1)',
                 }}
               >
-                <div className="flex-1 flex items-center px-4 gap-3 rounded-lg transition-all group"
+                <div className="flex-1 flex items-center px-4 gap-3 rounded-lg transition-all group glow-focus"
                   style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}
-                  onFocusCapture={e => ((e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,240,255,0.4)')}
-                  onBlurCapture={e => ((e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)')}
                 >
                   <span className="material-symbols-outlined" style={{ color: '#849495', fontSize: '20px' }}>link</span>
                   <input
@@ -465,10 +463,7 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded flex items-center justify-center"
-                  style={{ background: 'rgba(0,240,255,0.15)', border: '1px solid rgba(0,240,255,0.2)' }}>
-                  <span className="material-symbols-outlined text-sm" style={{ color: '#00f0ff', fontVariationSettings: "'FILL' 1" }}>account_tree</span>
-                </div>
+                <img src="/logo.png" alt="RepoLens AI Logo" className="h-6 w-auto object-contain rounded-sm" />
                 <span style={{ fontFamily: 'Geist, sans-serif', fontWeight: 700, fontSize: '15px', color: '#00f0ff' }}>
                   RepoLens AI
                 </span>

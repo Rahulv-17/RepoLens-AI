@@ -33,13 +33,7 @@ export function Navbar({ active = 'none', repoName, showSearch = false }: Navbar
       {/* Logo + Breadcrumb */}
       <div className="flex items-center gap-3">
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: 'rgba(0,240,255,0.12)', border: '1px solid rgba(0,240,255,0.2)' }}
-          >
-            <span className="material-symbols-outlined text-lg" style={{ color: '#00f0ff', fontVariationSettings: "'FILL' 1" }}>
-              account_tree
-            </span>
-          </div>
+          <img src="/logo.png" alt="RepoLens AI Logo" className="h-8 w-auto object-contain rounded-lg" />
           <span style={{
             fontFamily: 'Geist, sans-serif',
             fontWeight: 700,
@@ -97,7 +91,7 @@ export function Navbar({ active = 'none', repoName, showSearch = false }: Navbar
               search
             </span>
             <input
-              className="w-full py-2 pl-10 pr-4 text-sm rounded-lg focus:outline-none transition-all"
+              className="w-full py-2 pl-10 pr-4 text-sm rounded-lg focus:outline-none transition-all glow-focus"
               placeholder="Search files, symbols, or components..."
               style={{
                 background: 'rgba(8,15,16,0.8)',
@@ -105,14 +99,6 @@ export function Navbar({ active = 'none', repoName, showSearch = false }: Navbar
                 color: '#dce4e5',
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: '13px',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(0,240,255,0.4)';
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,240,255,0.06)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>

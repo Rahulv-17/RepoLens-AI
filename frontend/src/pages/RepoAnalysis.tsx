@@ -93,10 +93,7 @@ export function RepoAnalysis() {
         <div className="flex items-center gap-4">
           {/* Logo */}
           <Link to="/dashboard" className="flex items-center gap-2.5" style={{ textDecoration: 'none' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: 'rgba(0,240,255,0.12)', border: '1px solid rgba(0,240,255,0.2)' }}>
-              <span className="material-symbols-outlined text-lg" style={{ color: '#00f0ff', fontVariationSettings: "'FILL' 1" }}>account_tree</span>
-            </div>
+            <img src="/logo.png" alt="RepoLens AI Logo" className="h-7 w-auto object-contain rounded-md" />
             <span style={{ fontFamily: 'Geist, sans-serif', fontWeight: 700, fontSize: '16px', color: '#00f0ff', letterSpacing: '-0.02em' }}>
               RepoLens AI
             </span>
@@ -115,21 +112,13 @@ export function RepoAnalysis() {
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: '#849495' }}>search</span>
             <input
               placeholder="Search files, symbols..."
-              className="w-full py-2 pl-9 pr-4 text-sm rounded-lg outline-none transition-all"
+              className="w-full py-2 pl-9 pr-4 text-sm rounded-lg outline-none transition-all glow-focus"
               style={{
                 background: 'rgba(8,15,16,0.8)',
                 border: '1px solid rgba(255,255,255,0.07)',
                 color: '#dce4e5',
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: '12px',
-              }}
-              onFocus={e => {
-                e.currentTarget.style.borderColor = 'rgba(0,240,255,0.4)';
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,240,255,0.06)';
-              }}
-              onBlur={e => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>
@@ -170,7 +159,7 @@ export function RepoAnalysis() {
       {/* ═══════════════════════════════════════════════════
           SIDEBAR
       ═══════════════════════════════════════════════════ */}
-      <aside className="fixed left-0 top-16 bottom-0 z-40 flex flex-col justify-between py-4"
+      <aside className="fixed left-0 top-16 bottom-0 z-40 flex flex-col py-4"
         style={{
           width: '256px',
           background: 'rgba(21,29,30,0.6)',
@@ -178,63 +167,63 @@ export function RepoAnalysis() {
           borderRight: '1px solid rgba(255,255,255,0.06)',
         }}
       >
-        <div>
+        <div className="flex-none px-2 space-y-0.5">
           {/* Nav items */}
-          <div className="px-2 space-y-0.5">
-            {SIDEBAR_ITEMS.map(item => {
-              const isActive = item.id === 'explorer' ? activeSidebar === 'explorer' : activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    if (item.id === 'explorer') {
-                      setActiveSidebar(prev => prev === 'explorer' ? '' : 'explorer');
-                    } else {
-                      setActiveTab(item.id as TabId);
-                    }
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded transition-all text-left"
-                  style={{
-                    background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-                    borderLeft: isActive ? '2px solid #00f0ff' : '2px solid transparent',
-                    color: isActive ? '#00f0ff' : '#b9cacb',
-                    fontFamily: 'Geist, sans-serif',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
-                  }}
-                  onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = '#00f0ff'; }}
-                  onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = '#b9cacb'; }}
-                >
-                  <span className="material-symbols-outlined text-lg"
-                    style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>
-                    {item.icon}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {item.label}
-                    {item.beta && (
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold" 
-                        style={{ background: 'rgba(0,240,255,0.1)', color: '#00f0ff', border: '1px solid rgba(0,240,255,0.2)', letterSpacing: '0.05em' }}>
-                        BETA
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* File explorer (shown when explorer is active) */}
-          {activeSidebar === 'explorer' && nodes.length > 0 && (
-            <div className="mt-4 px-2 max-h-[calc(100vh-400px)] overflow-y-auto custom-scrollbar">
-              <FileExplorer nodes={nodes} />
-            </div>
-          )}
+          {SIDEBAR_ITEMS.map(item => {
+            const isActive = item.id === 'explorer' ? activeSidebar === 'explorer' : activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  if (item.id === 'explorer') {
+                    setActiveSidebar(prev => prev === 'explorer' ? '' : 'explorer');
+                  } else {
+                    setActiveTab(item.id as TabId);
+                  }
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded transition-all text-left"
+                style={{
+                  background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                  borderLeft: isActive ? '2px solid #00f0ff' : '2px solid transparent',
+                  color: isActive ? '#00f0ff' : '#b9cacb',
+                  fontFamily: 'Geist, sans-serif',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                }}
+                onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = '#00f0ff'; }}
+                onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = '#b9cacb'; }}
+              >
+                <span className="material-symbols-outlined text-lg"
+                  style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>
+                  {item.icon}
+                </span>
+                <div className="flex items-center gap-2">
+                  {item.label}
+                  {item.beta && (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold" 
+                      style={{ background: 'rgba(0,240,255,0.1)', color: '#00f0ff', border: '1px solid rgba(0,240,255,0.2)', letterSpacing: '0.05em' }}>
+                      BETA
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
+        {/* File explorer (shown when explorer is active) */}
+        {activeSidebar === 'explorer' && nodes.length > 0 ? (
+          <div className="flex-1 mt-4 px-2 overflow-y-auto custom-scrollbar" style={{ minHeight: 0 }}>
+            <FileExplorer nodes={nodes} />
+          </div>
+        ) : (
+          <div className="flex-1" />
+        )}
+
         {/* Bottom */}
-        <div className="px-2 space-y-0.5">
+        <div className="flex-none px-2 space-y-0.5 mt-4">
           {[
             { icon: 'settings', label: 'Settings' },
             { icon: 'account_circle', label: 'Account' },
@@ -255,11 +244,10 @@ export function RepoAnalysis() {
       {/* ═══════════════════════════════════════════════════
           MAIN CONTENT
       ═══════════════════════════════════════════════════ */}
-      <main className="flex flex-col overflow-hidden" style={{ marginLeft: '256px', marginTop: '64px', flex: 1 }}>
-
+      <main className="flex flex-col overflow-hidden" style={{ marginLeft: '256px', marginTop: '64px', flex: 1, minHeight: 0, minWidth: 0 }}>
 
         {/* ── Tab Content ── */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="relative flex-1">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -267,7 +255,7 @@ export function RepoAnalysis() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="h-full"
+              className="absolute inset-0 overflow-y-auto custom-scrollbar"
             >
 
               {/* ════════════ OVERVIEW TAB ════════════ */}
@@ -421,8 +409,8 @@ export function RepoAnalysis() {
 
               {/* ════════════ DEPENDENCY GRAPH TAB ════════════ */}
               {activeTab === 'graph' && (
-                <div className="p-4 h-full flex flex-col" style={{ minHeight: 'calc(100vh - 128px)' }}>
-                  <div className="mb-4 flex items-center gap-3">
+                <div className="absolute inset-0 p-4 flex flex-col overflow-hidden">
+                  <div className="mb-4 flex-none flex items-center gap-3">
                     <h2 style={{ fontFamily: 'Geist, sans-serif', fontWeight: 600, fontSize: '18px', color: '#dce4e5' }}>
                       Dependency Architecture
                     </h2>
@@ -435,15 +423,17 @@ export function RepoAnalysis() {
                       {nodes.length} nodes · {edges.length} edges
                     </span>
                   </div>
-                  <div className="flex-1" style={{ minHeight: '500px' }}>
-                    <DependencyGraph graphData={repo.graphData} />
+                  <div className="relative flex-1 min-h-[500px]">
+                    <div className="absolute inset-0">
+                      <DependencyGraph graphData={repo.graphData} />
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* ════════════ AI CHAT TAB ════════════ */}
               {activeTab === 'chat' && (
-                <div className="h-full flex flex-col" style={{ minHeight: 'calc(100vh - 128px)' }}>
+                <div className="absolute inset-0 flex flex-col overflow-hidden">
                   {/* Chat toolbar */}
                   <div className="flex items-center justify-between px-6 py-2.5 flex-shrink-0"
                     style={{ background: 'rgba(21,29,30,0.4)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>

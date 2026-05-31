@@ -143,21 +143,13 @@ export function Dashboard() {
                       onChange={e => setRepoUrl(e.target.value)}
                       placeholder="https://github.com/org/repo"
                       disabled={isAnalyzing}
-                      className="w-full rounded-xl pl-10 pr-4 py-3 text-sm outline-none transition-all"
+                      className="w-full rounded-xl pl-10 pr-4 py-3 text-sm outline-none transition-all glow-focus"
                       style={{
                         background: 'rgba(8,15,16,0.8)',
                         border: '1px solid rgba(255,255,255,0.08)',
                         color: '#dce4e5',
                         fontFamily: "'JetBrains Mono', monospace",
                         fontSize: '12px',
-                      }}
-                      onFocus={e => {
-                        e.currentTarget.style.borderColor = 'rgba(0,240,255,0.5)';
-                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,240,255,0.06)';
-                      }}
-                      onBlur={e => {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     />
                   </div>

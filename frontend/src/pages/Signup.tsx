@@ -43,14 +43,7 @@ export function Signup() {
     fontFamily: 'Inter, sans-serif',
   };
 
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = 'rgba(0,240,255,0.5)';
-    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,240,255,0.08), inset 0 0 0 1px rgba(0,240,255,0.1)';
-  };
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-    e.currentTarget.style.boxShadow = 'none';
-  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden"
@@ -82,12 +75,8 @@ export function Signup() {
           <div className="p-8">
             {/* Logo area */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
-                style={{ background: 'rgba(208,188,255,0.1)', border: '1px solid rgba(208,188,255,0.25)' }}
-              >
-                <span className="material-symbols-outlined text-2xl" style={{ color: '#d0bcff', fontVariationSettings: "'FILL' 1" }}>
-                  rocket_launch
-                </span>
+              <div className="mb-6 flex justify-center">
+                <img src="/logo.png" alt="RepoLens AI Logo" className="h-10 w-auto object-contain rounded-xl" />
               </div>
               <h1 style={{ fontFamily: 'Geist, sans-serif', fontWeight: 700, fontSize: '22px', letterSpacing: '-0.02em', color: '#dce4e5' }}>
                 Create an account
@@ -120,9 +109,8 @@ export function Signup() {
                   onChange={e => setUsername(e.target.value)}
                   placeholder="johndoe"
                   autoComplete="username"
-                  className="mt-1.5 w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
+                  className="mt-1.5 w-full rounded-xl px-4 py-3 text-sm outline-none transition-all glow-focus"
                   style={inputStyle}
-                  onFocus={handleFocus} onBlur={handleBlur}
                 />
               </div>
 
@@ -136,9 +124,8 @@ export function Signup() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="mt-1.5 w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
+                  className="mt-1.5 w-full rounded-xl px-4 py-3 text-sm outline-none transition-all glow-focus"
                   style={inputStyle}
-                  onFocus={handleFocus} onBlur={handleBlur}
                 />
               </div>
 
@@ -153,9 +140,8 @@ export function Signup() {
                     required value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-xl px-4 py-3 pr-12 text-sm outline-none transition-all"
+                    className="w-full rounded-xl px-4 py-3 pr-12 text-sm outline-none transition-all glow-focus"
                     style={{ ...inputStyle, fontFamily: "'JetBrains Mono', monospace", letterSpacing: showPassword ? 'normal' : '0.15em' }}
-                    onFocus={handleFocus} onBlur={handleBlur}
                   />
                   <button type="button" onClick={() => setShowPassword(v => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2"
@@ -176,9 +162,8 @@ export function Signup() {
                   required value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="mt-1.5 w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
+                  className="mt-1.5 w-full rounded-xl px-4 py-3 text-sm outline-none transition-all glow-focus"
                   style={{ ...inputStyle, fontFamily: "'JetBrains Mono', monospace", letterSpacing: showPassword ? 'normal' : '0.15em' }}
-                  onFocus={handleFocus} onBlur={handleBlur}
                 />
               </div>
 

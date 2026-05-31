@@ -499,7 +499,8 @@ export function DependencyGraph({ graphData }: DependencyGraphProps) {
       </div>
 
       {/* ── Legend Panel ── */}
-      <div className="absolute bottom-6 left-6 glass-panel-heavy rounded-2xl p-5 w-72 z-20 overflow-hidden">
+      <div className="absolute bottom-6 left-6 z-20">
+        <div className="glass-panel-heavy rounded-2xl p-5 w-72 overflow-hidden">
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(to right, rgba(0,240,255,0.4), transparent)' }} />
         <div className="flex items-center justify-between mb-4">
           <h3 style={{ fontSize: '11px', fontWeight: 700, color: '#dce4e5', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'Geist, sans-serif' }}>
@@ -543,13 +544,15 @@ export function DependencyGraph({ graphData }: DependencyGraphProps) {
           ))}
         </div>
       </div>
+    </div>
 
       {/* ── Node Info HUD ── */}
       {selectedInfo && (
-        <div
-          className="absolute z-30 glass-panel-heavy rounded-3xl overflow-hidden"
-          style={{ top: '24px', right: '24px', width: '280px', border: '1px solid rgba(255,255,255,0.1)' }}
-        >
+        <div className="absolute z-30" style={{ top: '24px', right: '24px' }}>
+          <div
+            className="glass-panel-heavy rounded-3xl overflow-hidden"
+            style={{ width: '280px', border: '1px solid rgba(255,255,255,0.1)' }}
+          >
           <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(0,240,255,0.5), rgba(208,188,255,0.3), transparent)' }} />
           <div className="p-5" style={{ background: 'rgba(35,43,44,0.5)' }}>
             <div className="flex items-start justify-between mb-4">
@@ -607,6 +610,7 @@ export function DependencyGraph({ graphData }: DependencyGraphProps) {
             </div>
           </div>
         </div>
+      </div>
       )}
     </div>
   );
