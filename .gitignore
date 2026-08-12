@@ -134,3 +134,15 @@ dist
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Lint reports
+lint-report.json

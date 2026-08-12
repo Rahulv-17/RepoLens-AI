@@ -441,19 +441,22 @@ export function LandingPage() {
                   GET STARTED FREE
                 </motion.button>
               </Link>
-              <motion.button
-                whileHover={{ background: 'rgba(255,255,255,0.05)' }}
-                whileTap={{ scale: 0.97 }}
-                className="px-10 py-4 rounded-xl font-medium transition-colors"
-                style={{
-                  background: 'transparent',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: '#dce4e5',
-                  fontFamily: 'Geist, sans-serif', fontSize: '13px', letterSpacing: '0.06em',
-                }}
-              >
-                Contact Sales
-              </motion.button>
+              <a href="mailto:sales@repolens.ai">
+                <motion.button
+                  whileHover={{ background: 'rgba(255,255,255,0.05)' }}
+                  whileTap={{ scale: 0.97 }}
+                  className="px-10 py-4 rounded-xl font-medium transition-colors"
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: '#dce4e5',
+                    fontFamily: 'Geist, sans-serif', fontSize: '13px', letterSpacing: '0.06em',
+                  }}
+                >
+                  Contact Sales
+                </motion.button>
+              </a>
+
             </div>
           </motion.div>
         </section>
@@ -468,9 +471,35 @@ export function LandingPage() {
                   RepoLens AI
                 </span>
               </div>
-              <p style={{ color: '#849495', fontSize: '13px', lineHeight: 1.6, maxWidth: '200px' }}>
+              <p style={{ color: '#849495', fontSize: '13px', lineHeight: 1.6, maxWidth: '200px', marginBottom: '20px' }}>
                 Decode any codebase in seconds with AI-powered analysis.
               </p>
+              <div className="flex gap-3 mt-6">
+                <a href="https://www.instagram.com/being.rahulistic/" target="_blank" rel="noreferrer" 
+                   className="p-2.5 rounded-full transition-colors flex items-center justify-center h-10 w-10"
+                   style={{ background: 'rgba(255,255,255,0.03)', color: '#b9cacb', border: '1px solid rgba(255,255,255,0.05)' }}
+                   onMouseEnter={e => { (e.currentTarget.style.color = '#00f0ff'); (e.currentTarget.style.borderColor = '#00f0ff'); }}
+                   onMouseLeave={e => { (e.currentTarget.style.color = '#b9cacb'); (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'); }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </a>
+                <a href="https://www.linkedin.com/in/rahulvaddi/" target="_blank" rel="noreferrer" 
+                   className="p-2.5 rounded-full transition-colors flex items-center justify-center h-10 w-10"
+                   style={{ background: 'rgba(255,255,255,0.03)', color: '#b9cacb', border: '1px solid rgba(255,255,255,0.05)' }}
+                   onMouseEnter={e => { (e.currentTarget.style.color = '#00f0ff'); (e.currentTarget.style.borderColor = '#00f0ff'); }}
+                   onMouseLeave={e => { (e.currentTarget.style.color = '#b9cacb'); (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'); }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                </a>
+                <a href="https://github.com/Rahulv-17" target="_blank" rel="noreferrer" 
+                   className="p-2.5 rounded-full transition-colors flex items-center justify-center h-10 w-10"
+                   style={{ background: 'rgba(255,255,255,0.03)', color: '#b9cacb', border: '1px solid rgba(255,255,255,0.05)' }}
+                   onMouseEnter={e => { (e.currentTarget.style.color = '#00f0ff'); (e.currentTarget.style.borderColor = '#00f0ff'); }}
+                   onMouseLeave={e => { (e.currentTarget.style.color = '#b9cacb'); (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'); }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                </a>
+              </div>
             </div>
             {[
               { title: 'Product', links: ['Explorer', 'Dependency Graph', 'AI Chat', 'Changelog'] },
@@ -502,7 +531,7 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4"
             style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
             <p style={{ color: '#849495', fontSize: '12px' }}>© 2026 RepoLens AI. All rights reserved.</p>
-            <p style={{ color: '#849495', fontSize: '12px' }}>Built for developers, by developers.</p>
+            <p style={{ color: '#849495', fontSize: '12px' }}>Made by Rahul Vaddi , For developers.</p>
           </div>
         </footer>
       </main>

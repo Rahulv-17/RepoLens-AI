@@ -1,12 +1,14 @@
 import { Response } from 'express';
 import path from 'path';
-import { reposDb } from '../utils/jsonStore';
-import { AuthRequest } from '../middleware/auth';
+import { Repository } from '../models/Repository';
+import { ChatHistory } from '../models/ChatHistory';
+import { AuthRequest } from '../middleware/authMiddleware';
 import { cloneRepository, cleanupRepository } from '../services/cloneService';
 import { scanDirectory } from '../services/scannerService';
 import { parseFile, ParsedFile } from '../parsers/astParser';
 import { generateGraphData } from '../graph/graphGenerator';
 import { chatWithRepo as aiChatWithRepo } from '../ai/geminiService';
+import { getRelevantContext } from '../ai/contextRetriever';
 
 // ── Tech stack detection from URL heuristics ──────────────────────────────────
 function detectTechStack(repoUrl: string): string[] {
@@ -80,16 +82,25 @@ export const analyzeRepo = async (req: AuthRequest, res: Response): Promise<void
     // Generate tech stack and summary
     const techStack = detectTechStack(repoUrl);
     const fileCount = files.length;
-    const summary = `Analyzed ${fileCount} files in ${repoName}. The codebase uses ${techStack.join(', ')} and shows strong modular design principles with ${graphData.edges.length} inter-module connections.`;
+    const dependencyCount = graphData.edges.length;
+    const importantFiles = parsedFiles.filter(f => f.exports.length > 0 || f.imports.length > 5).map(f => f.filePath).slice(0, 10);
+    const summary = `Analyzed ${fileCount} files in ${repoName}. The codebase uses ${techStack.join(', ')} and shows strong modular design principles with ${dependencyCount} inter-module connections.`;
 
-    const repo = reposDb.create({
-      userId: req.user?.userId,
+    const repo = await Repository.create({
+      owner: req.user?.userId,
       repoName,
       repoUrl,
       techStack,
       summary,
-      fileCount,
-      graphData,
+      astAnalysis: parsedFiles,
+      dependencyGraph: graphData,
+      importantFiles,
+      metrics: {
+        fileCount,
+        dependencyCount,
+        complexityScore: Math.floor(dependencyCount / (fileCount || 1) * 10),
+        averageHealth: Math.max(0, 100 - Math.floor(dependencyCount / (fileCount || 1) * 2)),
+      }
     });
 
     res.status(200).json(repo);
@@ -105,9 +116,7 @@ export const analyzeRepo = async (req: AuthRequest, res: Response): Promise<void
 
 export const getRepos = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const repos = reposDb
-      .find({ userId: req.user?.userId })
-      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const repos = await Repository.find({ owner: req.user?.userId }).sort({ createdAt: -1 });
     res.status(200).json(repos);
   } catch (error) {
     console.error('[getRepos]', error);
@@ -117,7 +126,7 @@ export const getRepos = async (req: AuthRequest, res: Response): Promise<void> =
 
 export const getRepoById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const repo = reposDb.findOneById(req.params.id, { userId: req.user?.userId });
+    const repo = await Repository.findOne({ _id: req.params.id, owner: req.user?.userId });
     if (!repo) {
       res.status(404).json({ error: 'Repository not found' });
       return;
@@ -131,7 +140,7 @@ export const getRepoById = async (req: AuthRequest, res: Response): Promise<void
 
 export const chatWithRepo = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const repo = reposDb.findOneById(req.params.id, { userId: req.user?.userId });
+    const repo = await Repository.findOne({ _id: req.params.id, owner: req.user?.userId });
     if (!repo) {
       res.status(404).json({ error: 'Repository not found' });
       return;
@@ -139,33 +148,92 @@ export const chatWithRepo = async (req: AuthRequest, res: Response): Promise<voi
 
     const { message = '' } = req.body;
 
+    if (!message.trim()) {
+      res.status(400).json({ error: 'Message cannot be empty' });
+      return;
+    }
+
+    // Save user message to history
+    await ChatHistory.create({
+      user: req.user?.userId,
+      repository: repo._id,
+      role: 'user',
+      content: message
+    });
+
+    // Retrieve last 10 messages for context
+    const history = await ChatHistory.find({ user: req.user?.userId, repository: repo._id })
+      .sort({ createdAt: -1 })
+      .limit(10);
+      
+    history.reverse();
+    const historyContext = history.map(h => `${h.role}: ${h.content}`).join('\n');
+
+    const relevantASTContext = getRelevantContext(message, repo);
+
     const contextContext = `Repository Name: ${repo.repoName}
 Tech Stack: ${repo.techStack?.join(', ') || 'Unknown'}
-Total Files: ${repo.fileCount}
+Total Files: ${repo.metrics?.fileCount}
 Summary: ${repo.summary}
-Number of connections/edges in architecture graph: ${repo.graphData?.edges?.length ?? 0}`;
+Number of connections/edges in architecture graph: ${repo.metrics?.dependencyCount ?? 0}
+
+${relevantASTContext}
+
+Recent Conversation History:
+${historyContext}
+`;
 
     const response = await aiChatWithRepo(message, contextContext);
 
+    // Save assistant message to history
+    await ChatHistory.create({
+      user: req.user?.userId,
+      repository: repo._id,
+      role: 'assistant',
+      content: response
+    });
+
     res.status(200).json({ response });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[chatWithRepo]', error);
-    res.status(500).json({ error: 'Failed to process chat message' });
+    res.status(500).json({ error: error.message || 'Failed to process chat message' });
   }
 };
 
 export const deleteRepo = async (req: AuthRequest, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
-    const repo = reposDb.findOneById(id, { userId: req.user?.userId });
+    const repo = await Repository.findOneAndDelete({ _id: id, owner: req.user?.userId });
     if (!repo) {
       res.status(404).json({ error: 'Repository not found' });
       return;
     }
-    reposDb.deleteById(id);
+    // Delete associated chat history
+    await ChatHistory.deleteMany({ repository: id });
     res.status(200).json({ message: 'Repository deleted successfully' });
   } catch (error: any) {
     console.error('[deleteRepo]', error);
     res.status(500).json({ error: 'Failed to delete repository' });
+  }
+};
+
+export const getChatHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const history = await ChatHistory.find({ repository: req.params.id, user: req.user?.userId })
+      .sort({ createdAt: 1 });
+    res.status(200).json(history);
+  } catch (error) {
+    console.error('[getChatHistory]', error);
+    res.status(500).json({ error: 'Failed to fetch chat history' });
+  }
+};
+
+export const clearChatHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    await ChatHistory.deleteMany({ repository: req.params.id, user: req.user?.userId });
+    res.status(200).json({ message: 'Chat history cleared' });
+  } catch (error) {
+    console.error('[clearChatHistory]', error);
+    res.status(500).json({ error: 'Failed to clear chat history' });
   }
 };

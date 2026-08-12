@@ -27,12 +27,52 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isStreaming]);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/repos/${repoId}/chat`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setMessages(data.map((msg: any) => ({
+              id: msg._id,
+              role: msg.role,
+              content: msg.content,
+              timestamp: new Date(msg.createdAt)
+            })));
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load chat history', e);
+      }
+    };
+    fetchHistory();
+  }, [repoId, token]);
+
+  const clearHistory = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/repos/${repoId}/chat`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setMessages([]);
+        setShowClearConfirm(false);
+      }
+    } catch (e) {
+      console.error('Failed to clear chat history', e);
+    }
+  };
 
   const autoResize = () => {
     if (textareaRef.current) {
@@ -55,6 +95,8 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
     setInput('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsStreaming(true);
+
+
 
     try {
       const res = await fetch(`http://localhost:5000/api/repos/${repoId}/chat`, {
@@ -100,6 +142,8 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
         style={{ background: 'rgba(0,240,255,0.06)', filter: 'blur(120px)', borderRadius: '50%' }} />
       <div className="fixed top-1/4 left-1/4 w-72 h-72 pointer-events-none -z-10"
         style={{ background: 'rgba(87,27,193,0.05)', filter: 'blur(100px)', borderRadius: '50%' }} />
+
+
 
       {/* ── Empty State ── */}
       {messages.length === 0 && !isStreaming && (
@@ -207,16 +251,39 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
                       <div className="flex items-center gap-4 mt-2 px-1">
                         <span style={{ fontSize: '10px', color: '#849495' }}>{formatTime(msg.timestamp)}</span>
                         <div className="flex gap-2">
-                          {['thumb_up', 'thumb_down', 'refresh'].map(icon => (
-                            <button key={icon}
-                              className="transition-colors"
-                              style={{ color: '#849495' }}
-                              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = icon === 'thumb_down' ? '#ffb4ab' : '#00f0ff')}
-                              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#849495')}
-                            >
-                              <span className="material-symbols-outlined text-base">{icon}</span>
-                            </button>
-                          ))}
+                          <button
+                            title="Helpful"
+                            onClick={(e) => {
+                               (e.currentTarget as HTMLElement).style.color = '#00f0ff';
+                               alert('Feedback recorded!');
+                            }}
+                            className="transition-colors hover:text-[#00f0ff]"
+                            style={{ color: '#849495' }}
+                          >
+                            <span className="material-symbols-outlined text-base">thumb_up</span>
+                          </button>
+                          <button
+                            title="Not Helpful"
+                            onClick={(e) => {
+                               (e.currentTarget as HTMLElement).style.color = '#ffb4ab';
+                               alert('Feedback recorded!');
+                            }}
+                            className="transition-colors hover:text-[#ffb4ab]"
+                            style={{ color: '#849495' }}
+                          >
+                            <span className="material-symbols-outlined text-base">thumb_down</span>
+                          </button>
+                          <button
+                            title="Regenerate"
+                            onClick={() => {
+                               const lastUserMsg = messages.slice().reverse().find(m => m.role === 'user');
+                               if (lastUserMsg) sendMessage(lastUserMsg.content);
+                            }}
+                            className="transition-colors hover:text-white"
+                            style={{ color: '#849495' }}
+                          >
+                            <span className="material-symbols-outlined text-base">refresh</span>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -349,10 +416,76 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
           </div>
         </div>
 
-        <p className="text-center mt-3" style={{ fontSize: '10px', color: '#849495', fontFamily: 'Geist, sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.5 }}>
-          RepoLens AI can make mistakes. Verify critical code.
-        </p>
+        <div className="flex items-center justify-between mt-3 px-1">
+          <p style={{ fontSize: '10px', color: '#849495', fontFamily: 'Geist, sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.5 }}>
+            RepoLens AI can make mistakes. Verify critical code.
+          </p>
+          
+          {messages.length > 0 && (
+            <button
+              onClick={() => setShowClearConfirm(true)}
+              disabled={isStreaming}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:bg-[rgba(255,180,171,0.1)] hover:text-[#ffb4ab] disabled:opacity-50"
+              style={{ color: '#849495', fontSize: '11px', fontFamily: 'Geist, sans-serif', letterSpacing: '0.05em', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
+              title="Clear Chat History"
+            >
+              <span className="material-symbols-outlined text-sm">delete</span>
+              CLEAR CHAT
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* ── Custom Confirm Modal ── */}
+      <AnimatePresence>
+        {showClearConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex items-center justify-center p-6"
+            style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(8px)' }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="p-6 rounded-2xl max-w-sm w-full shadow-2xl border"
+              style={{
+                background: 'rgba(15, 20, 20, 0.95)',
+                borderColor: 'rgba(255, 180, 171, 0.2)',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255, 180, 171, 0.1) inset'
+              }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255, 180, 171, 0.1)' }}>
+                  <span className="material-symbols-outlined text-[#ffb4ab]">warning</span>
+                </div>
+                <h3 className="text-lg font-semibold" style={{ color: '#dce4e5', fontFamily: 'Geist, sans-serif' }}>Clear Chat</h3>
+              </div>
+              <p className="text-sm mb-6" style={{ color: '#849495', lineHeight: 1.5 }}>
+                Are you sure you want to clear this chat history? This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowClearConfirm(false)}
+                  className="px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-[rgba(255,255,255,0.1)]"
+                  style={{ color: '#dce4e5', background: 'rgba(255, 255, 255, 0.05)' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={clearHistory}
+                  className="px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:opacity-90"
+                  style={{ color: '#1a0000', background: '#ffb4ab' }}
+                >
+                  Clear History
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

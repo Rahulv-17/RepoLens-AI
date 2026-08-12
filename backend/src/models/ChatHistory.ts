@@ -1,9 +1,22 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-const chatHistorySchema = new mongoose.Schema({
-  repoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Repository', required: true },
-  question: { type: String, required: true },
-  answer: { type: String, required: true },
-}, { timestamps: true });
+export interface IChatHistory extends Document {
+  user: mongoose.Types.ObjectId;
+  repository: mongoose.Types.ObjectId;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export const ChatHistory = mongoose.model('ChatHistory', chatHistorySchema);
+const ChatHistorySchema: Schema = new Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    repository: { type: mongoose.Schema.Types.ObjectId, ref: 'Repository', required: true },
+    role: { type: String, enum: ['user', 'assistant'], required: true },
+    content: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+export const ChatHistory = mongoose.model<IChatHistory>('ChatHistory', ChatHistorySchema);

@@ -2,7 +2,7 @@ import { ParsedFile } from '../parsers/astParser';
 
 export interface GraphNode {
   id: string;
-  data: { label: string; type: string };
+  data: { label: string; type: string; functions?: string[]; exports?: string[] };
   position: { x: number; y: number };
 }
 
@@ -26,7 +26,12 @@ export const generateGraphData = (parsedFiles: ParsedFile[]): GraphData => {
   parsedFiles.forEach((file, index) => {
     nodes.push({
       id: file.filePath,
-      data: { label: file.filePath.split('/').pop() || file.filePath, type: 'file' },
+      data: { 
+        label: file.filePath.split('/').pop() || file.filePath, 
+        type: 'file',
+        functions: file.functions,
+        exports: file.exports,
+      },
       position: { x: (index % 5) * 200, y: Math.floor(index / 5) * 150 },
     });
     fileSet.add(file.filePath);

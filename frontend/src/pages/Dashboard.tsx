@@ -205,8 +205,8 @@ export function Dashboard() {
                 <div className="mt-6 pt-5 grid grid-cols-2 gap-3"
                   style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                   {[
-                    { label: 'Repos Analyzed', value: repos.length },
-                    { label: 'Avg Files', value: repos.length > 0 ? Math.round(repos.reduce((a, r) => a + (r.fileCount || 0), 0) / repos.length) : 0 },
+                    { label: 'Total Repos', value: repos.length },
+                    { label: 'Avg Health', value: repos.length > 0 ? Math.round(repos.reduce((a, r) => a + (r.metrics?.averageHealth || 100), 0) / repos.length) + '%' : '—' },
                   ].map(stat => (
                     <div key={stat.label} className="text-center p-3 rounded-xl"
                       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -218,6 +218,18 @@ export function Dashboard() {
                       </div>
                     </div>
                   ))}
+                  
+                  {repos.length > 0 && (
+                    <div className="col-span-2 text-center p-3 rounded-xl"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ fontSize: '10px', color: '#849495', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        Last Analyzed
+                      </div>
+                      <div className="truncate px-2" style={{ fontFamily: 'Geist, sans-serif', fontWeight: 600, fontSize: '13px', color: '#dce4e5' }}>
+                        {repos[0].repoName}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -353,7 +365,7 @@ export function Dashboard() {
                             style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '12px' }}>
                             <span className="flex items-center gap-1.5" style={{ color: '#849495', fontSize: '11px' }}>
                               <span className="material-symbols-outlined text-sm">description</span>
-                              {repo.fileCount ?? '—'} files
+                              {repo.metrics?.fileCount ?? '—'} files
                             </span>
                             <span style={{ color: '#849495', fontSize: '11px' }}>
                               {new Date(repo.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}

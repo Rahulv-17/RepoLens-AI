@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { DependencyGraph } from '../components/DependencyGraph';
 import { FileExplorer } from '../components/FileExplorer';
 import { AiChat } from '../components/AiChat';
+import { ProfileModal } from '../components/ProfileModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type TabId = 'overview' | 'graph' | 'chat' | 'complexity';
@@ -23,19 +24,24 @@ export function RepoAnalysis() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [activeSidebar, setActiveSidebar] = useState('explorer');
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
+
+  const fetchRepo = async () => {
+    if (!id || !token) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/repos/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) setRepo(data);
+    } catch (e) { console.error(e); }
+    finally { setIsLoading(false); }
+  };
 
   useEffect(() => {
-    if (!id || !token) return;
-    (async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/repos/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (res.ok) setRepo(data);
-      } catch (e) { console.error(e); }
-      finally { setIsLoading(false); }
-    })();
+    fetchRepo();
   }, [id, token]);
 
   if (!token) return <Navigate to="/login" replace />;
@@ -70,11 +76,28 @@ export function RepoAnalysis() {
     );
   }
 
-  const nodes = repo.graphData?.nodes || [];
-  const edges = repo.graphData?.edges || [];
-  const healthScore = Math.min(100, 60 + Math.round((nodes.length > 0 ? 30 : 0)));
+  const nodes = repo.dependencyGraph?.nodes || [];
+  const edges = repo.dependencyGraph?.edges || [];
+  const maxIncoming = Math.max(...nodes.map((n: any) => edges.filter((e: any) => e.target === n.id).length), 0);
+  const avgCoupling = nodes.length > 0 ? edges.length / nodes.length : 0;
+  
+  let calculatedHealth = 100;
+  calculatedHealth -= avgCoupling * 5;
+  calculatedHealth -= (maxIncoming > 5 ? (maxIncoming - 5) * 2 : 0);
+  const healthScore = Math.max(20, Math.min(100, Math.round(calculatedHealth)));
+
   const strokeDash = 364.4;
   const strokeOffset = strokeDash * (1 - healthScore / 100);
+
+  const filteredNodes = globalSearch 
+    ? nodes.filter((n: any) => {
+        const q = globalSearch.toLowerCase();
+        const inPath = n.id.toLowerCase().includes(q);
+        const inFunc = n.data?.functions?.some((f: string) => f.toLowerCase().includes(q));
+        const inExp = n.data?.exports?.some((e: string) => e.toLowerCase().includes(q));
+        return inPath || inFunc || inExp;
+      }) 
+    : nodes;
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#0d1515' }}>
@@ -111,6 +134,8 @@ export function RepoAnalysis() {
           <div className="relative group">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: '#849495' }}>search</span>
             <input
+              value={globalSearch}
+              onChange={(e) => setGlobalSearch(e.target.value)}
               placeholder="Search files, symbols..."
               className="w-full py-2 pl-9 pr-4 text-sm rounded-lg outline-none transition-all glow-focus"
               style={{
@@ -127,6 +152,7 @@ export function RepoAnalysis() {
         {/* Right actions */}
         <div className="flex items-center gap-3">
           <motion.button
+            onClick={fetchRepo}
             whileHover={{ scale: 1.02, boxShadow: '0 0 15px rgba(0,240,255,0.3)' }}
             whileTap={{ scale: 0.96 }}
             className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg font-semibold"
@@ -139,20 +165,32 @@ export function RepoAnalysis() {
             <span className="material-symbols-outlined text-base">refresh</span>
             REFRESH
           </motion.button>
-          {['notifications', 'settings'].map(icon => (
+          {['notifications'].map(icon => (
             <button key={icon}
+              disabled={true}
+              title={"Coming Soon"}
               className="p-2 rounded-full transition-colors"
-              style={{ color: '#849495' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+              style={{ color: '#849495', opacity: 0.5, cursor: 'not-allowed' }}
             >
               <span className="material-symbols-outlined text-xl">{icon}</span>
             </button>
           ))}
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-            style={{ background: 'rgba(0,240,255,0.15)', color: '#00f0ff', border: '1px solid rgba(0,240,255,0.2)' }}>
-            {user?.username?.[0]?.toUpperCase() || 'U'}
-          </div>
+          <button 
+            onClick={() => setIsProfileOpen(true)}
+            className="w-9 h-9 rounded-full overflow-hidden border-2 transition-all hover:scale-105"
+            style={{ borderColor: 'rgba(0,240,255,0.4)', background: 'rgba(0,240,255,0.1)' }}
+            title="Edit Profile"
+          >
+            {user?.profilePicture ? (
+              <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-sm font-bold"
+                style={{ color: '#00f0ff' }}
+              >
+                {user?.username?.[0]?.toUpperCase() || 'U'}
+              </div>
+            )}
+          </button>
         </div>
       </header>
 
@@ -202,7 +240,7 @@ export function RepoAnalysis() {
                 <div className="flex items-center gap-2">
                   {item.label}
                   {item.beta && (
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold" 
+                     <span className="px-1.5 py-0.5 rounded text-[9px] font-bold" 
                       style={{ background: 'rgba(0,240,255,0.1)', color: '#00f0ff', border: '1px solid rgba(0,240,255,0.2)', letterSpacing: '0.05em' }}>
                       BETA
                     </span>
@@ -216,7 +254,7 @@ export function RepoAnalysis() {
         {/* File explorer (shown when explorer is active) */}
         {activeSidebar === 'explorer' && nodes.length > 0 ? (
           <div className="flex-1 mt-4 px-2 overflow-y-auto custom-scrollbar" style={{ minHeight: 0 }}>
-            <FileExplorer nodes={nodes} />
+            <FileExplorer nodes={filteredNodes} />
           </div>
         ) : (
           <div className="flex-1" />
@@ -225,10 +263,10 @@ export function RepoAnalysis() {
         {/* Bottom */}
         <div className="flex-none px-2 space-y-0.5 mt-4">
           {[
-            { icon: 'settings', label: 'Settings' },
-            { icon: 'account_circle', label: 'Account' },
+            { icon: 'account_circle', label: 'Account', action: () => setIsProfileOpen(true) },
           ].map(item => (
             <button key={item.icon}
+              onClick={item.action}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded transition-colors"
               style={{ color: '#849495', fontFamily: 'Geist, sans-serif', fontSize: '12px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#00f0ff'}
@@ -327,10 +365,10 @@ export function RepoAnalysis() {
                           </span>
                         </div>
                       </div>
-                      <div className="w-full grid grid-cols-2 gap-2">
+                      <div className="w-full grid grid-cols-2 gap-2 mt-4">
                         {[
-                          { label: 'Performance', value: 'Optimal', color: '#00f0ff' },
-                          { label: 'Security', value: 'Secure', color: '#d0bcff' },
+                          { label: 'Modularity', value: avgCoupling < 1.5 ? 'High' : avgCoupling < 3 ? 'Medium' : 'Low', color: '#00f0ff' },
+                          { label: 'Coupling', value: maxIncoming > 10 ? 'High' : 'Acceptable', color: '#d0bcff' },
                         ].map(item => (
                           <div key={item.label} className="p-2 rounded text-center"
                             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -341,6 +379,7 @@ export function RepoAnalysis() {
                           </div>
                         ))}
                       </div>
+
                     </div>
 
                     {/* ── Stat Cards ── */}
@@ -369,40 +408,7 @@ export function RepoAnalysis() {
                       </motion.div>
                     ))}
 
-                    {/* ── Analysis Progress ── */}
-                    <div className="col-span-12 glass-panel p-6 rounded-2xl">
-                      <div className="flex items-center justify-between mb-5">
-                        <h3 style={{ fontFamily: 'Geist, sans-serif', fontWeight: 600, fontSize: '16px', color: '#dce4e5' }}>
-                          Analysis Progress
-                        </h3>
-                        <span style={{ fontSize: '13px', color: '#00f0ff', fontFamily: 'Geist, sans-serif' }}>100% Complete</span>
-                      </div>
-                      <div className="w-full rounded-full h-2 mb-6 overflow-hidden"
-                        style={{ background: 'rgba(255,255,255,0.06)' }}>
-                        <div className="h-full rounded-full" style={{ width: '100%', background: '#00f0ff', boxShadow: '0 0 8px rgba(0,240,255,0.5)' }} />
-                      </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {[
-                          { icon: 'check_circle', label: 'AST Extraction', time: '2m ago', done: true },
-                          { icon: 'check_circle', label: 'Graph Mapping', time: '1m ago', done: true },
-                          { icon: 'check_circle', label: 'Pattern Recognition', time: '30s ago', done: true },
-                          { icon: 'check_circle', label: 'Semantic Indexing', time: 'Completed', done: true },
-                        ].map(step => (
-                          <div key={step.label} className="flex items-center gap-3">
-                            {step.done ? (
-                              <span className="material-symbols-outlined text-xl" style={{ color: '#00f0ff' }}>check_circle</span>
-                            ) : (
-                              <div className="w-5 h-5 rounded-full border-2 animate-spin flex-shrink-0"
-                                style={{ borderColor: 'rgba(0,240,255,0.3)', borderTopColor: '#00f0ff' }} />
-                            )}
-                            <div>
-                              <div style={{ fontSize: '12px', color: '#dce4e5', fontWeight: 500 }}>{step.label}</div>
-                              <div style={{ fontSize: '10px', color: '#849495', marginTop: '1px' }}>{step.time}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+
                   </div>
                 </div>
               )}
@@ -425,7 +431,7 @@ export function RepoAnalysis() {
                   </div>
                   <div className="relative flex-1 min-h-[500px]">
                     <div className="absolute inset-0">
-                      <DependencyGraph graphData={repo.graphData} />
+                      <DependencyGraph graphData={repo.dependencyGraph} />
                     </div>
                   </div>
                 </div>
@@ -464,16 +470,16 @@ export function RepoAnalysis() {
                       Complexity Insights
                     </h2>
                     <p style={{ color: '#849495', fontSize: '14px', marginTop: '4px' }}>
-                      AI-powered code quality and complexity analysis
+                      AI-powered code quality and architecture analysis
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {[
-                      { icon: 'speed', color: '#00f0ff', bg: 'rgba(0,240,255,0.08)', border: '#00f0ff40', title: 'Cyclomatic Complexity', value: 'Low (2.4)', desc: 'Average function complexity is within acceptable bounds. No immediate refactoring needed.' },
-                      { icon: 'shield', color: '#d0bcff', bg: 'rgba(208,188,255,0.08)', border: '#d0bcff40', title: 'Type Safety', value: '98.2%', desc: 'Strict TypeScript mode detected. Excellent type coverage across the codebase.' },
-                      { icon: 'commit', color: '#fed639', bg: 'rgba(254,214,57,0.08)', border: '#fed63940', title: 'Code Duplication', value: '3.1%', desc: 'Minimal code duplication detected. DRY principles are well followed.' },
-                      { icon: 'layers', color: '#00dbe9', bg: 'rgba(0,219,233,0.08)', border: '#00dbe940', title: 'Module Cohesion', value: 'High', desc: 'Modules are well-organized with clear responsibilities and minimal coupling.' },
+                      { icon: 'speed', color: '#00f0ff', bg: 'rgba(0,240,255,0.08)', border: '#00f0ff40', title: 'Architecture Complexity', value: `${avgCoupling.toFixed(1)} edges/node`, desc: avgCoupling > 2 ? 'High coupling detected. Consider refactoring.' : 'Average coupling is within acceptable bounds.' },
+                      { icon: 'shield', color: '#d0bcff', bg: 'rgba(208,188,255,0.08)', border: '#d0bcff40', title: 'Type Safety', value: repo.techStack?.includes('TypeScript') ? 'High' : 'Low', desc: repo.techStack?.includes('TypeScript') ? 'TypeScript detected. Good type coverage expected.' : 'Consider adopting TypeScript for better safety.' },
+                      { icon: 'commit', color: '#fed639', bg: 'rgba(254,214,57,0.08)', border: '#fed63940', title: 'Module Isolation', value: `${nodes.filter((n: any) => edges.filter((e: any) => e.target === n.id || e.source === n.id).length === 0).length} nodes`, desc: 'Number of files with no dependencies (completely isolated).' },
+                      { icon: 'layers', color: '#00dbe9', bg: 'rgba(0,219,233,0.08)', border: '#00dbe940', title: 'Max Coupling', value: `${maxIncoming} incoming`, desc: 'The maximum number of dependents for a single file in the architecture.' },
                     ].map(card => (
                       <motion.div
                         key={card.title}
@@ -509,25 +515,35 @@ export function RepoAnalysis() {
                       </span>
                     </div>
                     <ul className="space-y-2">
-                      {[
-                        'Consider extracting repeated validation logic into a shared utility module.',
-                        'The authentication module has high coupling — review for potential decomposition.',
-                        'Test coverage could be improved in the /utils directory (currently estimated at 65%).',
-                      ].map((rec, i) => (
-                        <li key={i} className="flex items-start gap-3" style={{ color: '#b9cacb', fontSize: '13px', lineHeight: 1.5 }}>
-                          <span style={{ color: '#00f0ff', flexShrink: 0, fontWeight: 700 }}>{i + 1}.</span>
-                          {rec}
-                        </li>
-                      ))}
+                      {(() => {
+                        const recs = [];
+                        if (avgCoupling > 2) recs.push('Overall architecture shows high coupling. Consider introducing intermediate service layers to decouple modules.');
+                        if (!repo.techStack?.includes('TypeScript')) recs.push('Consider migrating critical modules to TypeScript for better type safety and maintainability.');
+                        const godObjects = nodes.filter((n: any) => edges.filter((e: any) => e.target === n.id).length > 8);
+                        if (godObjects.length > 0) {
+                          recs.push(`The file ${godObjects[0].data?.label || godObjects[0].id} has many dependents (${edges.filter((e: any) => e.target === godObjects[0].id).length}). Consider refactoring it into smaller modules.`);
+                        }
+                        if (recs.length === 0) recs.push('The architecture appears well-balanced. Continue following existing patterns.');
+                        return recs.map((rec, i) => (
+                          <li key={i} className="flex items-start gap-3" style={{ color: '#b9cacb', fontSize: '13px', lineHeight: 1.5 }}>
+                            <span style={{ color: '#00f0ff', flexShrink: 0, fontWeight: 700 }}>{i + 1}.</span>
+                            {rec}
+                          </li>
+                        ));
+                      })()}
                     </ul>
                   </div>
                 </div>
               )}
 
+
+
             </motion.div>
           </AnimatePresence>
         </div>
       </main>
+
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
 }

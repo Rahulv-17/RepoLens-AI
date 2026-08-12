@@ -22,6 +22,8 @@ interface CanvasNode {
   radius: number;
   incoming: number;
   outgoing: number;
+  functions?: string[];
+  exports?: string[];
 }
 
 interface CanvasEdge {
@@ -37,6 +39,8 @@ interface SelectedNodeInfo {
   outgoing: number;
   x: number;
   y: number;
+  functions?: string[];
+  exports?: string[];
 }
 
 const THEME = {
@@ -67,8 +71,7 @@ function buildCanvasData(graphData: GraphData, width: number, height: number): {
 
   const nodeMap = new Map<string, CanvasNode>();
 
-  graphData.nodes.forEach((gn, i) => {
-    const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+  graphData.nodes.forEach((gn) => {
     const spread = n === 1 ? 0 : r;
     const name = (gn.data?.label as string) || gn.id.split('/').pop() || gn.id;
     nodeMap.set(gn.id, {
@@ -83,6 +86,8 @@ function buildCanvasData(graphData: GraphData, width: number, height: number): {
       radius: 20,
       incoming: 0,
       outgoing: 0,
+      functions: gn.data?.functions as string[] | undefined,
+      exports: gn.data?.exports as string[] | undefined,
     });
   });
 
@@ -370,7 +375,13 @@ export function DependencyGraph({ graphData }: DependencyGraphProps) {
     const found = getNodeAt(mx, my);
     if (found) {
       selectedRef.current = found;
-      setSelectedInfo({ name: found.name, type: found.type, ext: found.ext, incoming: found.incoming, outgoing: found.outgoing, x: e.clientX, y: e.clientY });
+      setSelectedInfo({ 
+        name: found.name, type: found.type, ext: found.ext, 
+        incoming: found.incoming, outgoing: found.outgoing, 
+        x: e.clientX, y: e.clientY,
+        functions: found.functions,
+        exports: found.exports
+      });
     } else {
       selectedRef.current = null;
       setSelectedInfo(null);
@@ -592,6 +603,37 @@ export function DependencyGraph({ graphData }: DependencyGraphProps) {
                 </div>
               ))}
             </div>
+
+            {/* AST Functions */}
+            {((selectedInfo.functions && selectedInfo.functions.length > 0) || (selectedInfo.exports && selectedInfo.exports.length > 0)) && (
+              <div className="mb-4 space-y-3">
+                {selectedInfo.functions && selectedInfo.functions.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '9px', color: '#849495', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Functions</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedInfo.functions.slice(0, 8).map(fn => (
+                        <span key={fn} className="px-2 py-1 rounded-md text-[10px]" style={{ background: 'rgba(0,240,255,0.05)', color: '#00f0ff', border: '1px solid rgba(0,240,255,0.1)' }}>
+                          {fn}()
+                        </span>
+                      ))}
+                      {selectedInfo.functions.length > 8 && (
+                        <span className="px-2 py-1 rounded-md text-[10px]" style={{ background: 'rgba(255,255,255,0.02)', color: '#849495' }}>+{selectedInfo.functions.length - 8} more</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {selectedInfo.exports && selectedInfo.exports.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '9px', color: '#849495', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Exports</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="px-2 py-1 rounded-md text-[10px]" style={{ background: 'rgba(208,188,255,0.05)', color: '#d0bcff', border: '1px solid rgba(208,188,255,0.1)' }}>
+                        {selectedInfo.exports.length} exports
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* AI Insight */}
             <div className="p-3 rounded-xl"
