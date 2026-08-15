@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { User } from '../models/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { sendEmail } from '../utils/sendEmail';
 
 const USERNAME_REGEX = /^[a-zA-Z0-9_]{4,20}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -220,6 +222,105 @@ export const deleteAccount = async (req: any, res: Response): Promise<void> => {
     res.status(200).json({ message: 'Account deleted successfully' });
   } catch (error) {
     console.error('[deleteAccount]', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    
+    // Always return generic success message to prevent email enumeration
+    const message = 'If an account exists with that email, a password reset link has been sent.';
+
+    if (!user) {
+      res.status(200).json({ message });
+      return;
+    }
+
+    // Generate token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    // Hash token and set to user document
+    user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.resetPasswordExpires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    await user.save();
+
+    // Create reset url
+    const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+
+    const emailMessage = `
+We received a request to reset your RepoLens AI password.
+
+Click this link to reset your password:
+${resetUrl}
+
+This link will expire in 30 minutes.
+
+If you did not request this, you can safely ignore this email.
+`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'RepoLens AI - Password Reset',
+        message: emailMessage
+      });
+      res.status(200).json({ message });
+    } catch (error) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      res.status(500).json({ error: 'Email could not be sent' });
+    }
+  } catch (error) {
+    console.error('[forgotPassword]', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      res.status(400).json({ error: 'Token and new password are required' });
+      return;
+    }
+
+    if (!PASSWORD_REGEX.test(password)) {
+      res.status(400).json({ error: 'Invalid password format. Must be 8-16 chars, contain upper/lower/number/special.' });
+      return;
+    }
+
+    // Hash token
+    const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      res.status(400).json({ error: 'This password reset link is invalid or has expired.' });
+      return;
+    }
+
+    // Hash new password
+    user.password = await bcrypt.hash(password, 10);
+
+    // Clear reset token fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    
+    await user.save();
+
+    res.status(200).json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    console.error('[resetPassword]', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

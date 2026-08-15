@@ -16,7 +16,7 @@ async function test() {
   };
 
   try {
-    await mongoose.connect('mongodb+srv://vaddirahul3003_db_user:TbeKlfUiRDCKaH43@cluster0.jutfla0.mongodb.net/?appName=Cluster0');
+    await mongoose.connect(process.env.MONGODB_URI || '');
     // create a fake repo
     const repo = await Repository.create({
       owner: req.user.userId,

@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { LandingPage } from './pages/LandingPage';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
 import { Dashboard } from './pages/Dashboard';
 import { RepoAnalysis } from './pages/RepoAnalysis';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -33,6 +35,8 @@ function App() {
           <Route path="/" element={token ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
           <Route path="/login" element={token ? <Navigate to="/dashboard" replace /> : <Login />} />
           <Route path="/signup" element={token ? <Navigate to="/dashboard" replace /> : <Signup />} />
+          <Route path="/forgot-password" element={token ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />
+          <Route path="/reset-password/:token" element={token ? <Navigate to="/dashboard" replace /> : <ResetPassword />} />
           
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />

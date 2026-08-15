@@ -130,9 +130,14 @@ export function Login() {
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold tracking-widest uppercase text-[#849495] font-['Geist'] mb-1.5 block">
-                  Password
-                </label>
+                <div className="flex justify-between items-baseline mb-1.5">
+                  <label className="text-[10px] font-semibold tracking-widest uppercase text-[#849495] font-['Geist'] block">
+                    Password
+                  </label>
+                  <Link to="/forgot-password" className="text-[10px] text-[#00f0ff] hover:underline decoration-1 underline-offset-2 font-['Geist']">
+                    Forgot Password?
+                  </Link>
+                </div>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
