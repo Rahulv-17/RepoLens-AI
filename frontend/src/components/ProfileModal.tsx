@@ -50,6 +50,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [username, setUsername] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
   const [password, setPassword] = useState('');
@@ -169,8 +170,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     onClose();
   };
 
-  const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
+  const confirmDeleteAccount = async () => {
+    setShowDeleteConfirm(false);
     setIsLoading(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/account`, {
@@ -375,7 +376,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         Once you delete your account, there is no going back. Please be certain.
                       </p>
                       <button
-                        onClick={handleDeleteAccount}
+                        onClick={() => setShowDeleteConfirm(true)}
                         disabled={isLoading}
                         className="px-4 py-2 rounded-lg text-xs font-semibold transition-colors w-full"
                         style={{ background: 'rgba(255,180,171,0.1)', color: '#ffb4ab', border: '1px solid rgba(255,180,171,0.2)' }}
@@ -389,6 +390,57 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             )}
           </div>
         </motion.div>
+
+        {/* ── Custom Delete Confirm Modal ── */}
+        <AnimatePresence>
+          {showDeleteConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[110] flex items-center justify-center p-6"
+              style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(8px)' }}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="p-6 rounded-2xl max-w-sm w-full shadow-2xl border"
+                style={{
+                  background: 'rgba(15, 20, 20, 0.95)',
+                  borderColor: 'rgba(255, 180, 171, 0.2)',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255, 180, 171, 0.1) inset'
+                }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255, 180, 171, 0.1)' }}>
+                    <span className="material-symbols-outlined text-[#ffb4ab]">warning</span>
+                  </div>
+                  <h3 className="text-lg font-semibold" style={{ color: '#dce4e5', fontFamily: 'Geist, sans-serif' }}>Delete Account</h3>
+                </div>
+                <p className="text-sm mb-6" style={{ color: '#849495', lineHeight: 1.5 }}>
+                  Are you sure you want to delete your account? This action cannot be undone.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-[rgba(255,255,255,0.1)]"
+                    style={{ color: '#dce4e5', background: 'rgba(255, 255, 255, 0.05)' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeleteAccount}
+                    className="px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:opacity-90"
+                    style={{ color: '#1a0000', background: '#ffb4ab' }}
+                  >
+                    Delete Account
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </AnimatePresence>
   );

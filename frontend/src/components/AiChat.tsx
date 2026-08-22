@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import toast from 'react-hot-toast';
 
 interface Message {
   id: string;
@@ -255,7 +256,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
                             title="Helpful"
                             onClick={(e) => {
                                (e.currentTarget as HTMLElement).style.color = '#00f0ff';
-                               alert('Feedback recorded!');
+                               toast.success('Feedback recorded!');
                             }}
                             className="transition-colors hover:text-[#00f0ff]"
                             style={{ color: '#849495' }}
@@ -266,7 +267,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
                             title="Not Helpful"
                             onClick={(e) => {
                                (e.currentTarget as HTMLElement).style.color = '#ffb4ab';
-                               alert('Feedback recorded!');
+                               toast.success('Feedback recorded!');
                             }}
                             className="transition-colors hover:text-[#ffb4ab]"
                             style={{ color: '#849495' }}
