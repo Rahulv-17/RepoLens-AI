@@ -236,7 +236,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'gap-4'}`}
               >
                 {msg.role === 'user' ? (
-                  <div className="max-w-[80%] flex flex-col items-end">
+                  <div className="max-w-[80%] min-w-0 flex flex-col items-end">
                     <div className="px-5 py-3 rounded-2xl rounded-tr-none"
                       style={{
                         background: 'rgba(255,255,255,0.05)',
@@ -261,7 +261,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
                         smart_toy
                       </span>
                     </div>
-                    <div className="max-w-[85%]">
+                    <div className="max-w-[85%] min-w-0">
                       <div className="p-5 rounded-2xl rounded-tl-none"
                         style={{
                           background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(0,240,255,0.03) 100%)',
@@ -285,7 +285,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
                           <span style={{ fontSize: '10px', color: '#849495' }}>Verified Context</span>
                         </div>
 
-                        <div className="markdown-body" style={{ color: '#dce4e5', fontSize: '15px', lineHeight: 1.7, fontFamily: 'Inter, sans-serif' }}>
+                        <div className="markdown-body overflow-x-auto break-words" style={{ color: '#dce4e5', fontSize: '15px', lineHeight: 1.7, fontFamily: 'Inter, sans-serif' }}>
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>
                       </div>
