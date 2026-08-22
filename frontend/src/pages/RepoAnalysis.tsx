@@ -218,6 +218,7 @@ export function RepoAnalysis() {
                     setActiveSidebar(prev => prev === 'explorer' ? '' : 'explorer');
                   } else {
                     setActiveTab(item.id as TabId);
+                    if (window.innerWidth < 768) setIsMobileMenuOpen(false);
                   }
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded transition-all text-left"
