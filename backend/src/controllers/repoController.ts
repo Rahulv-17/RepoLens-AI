@@ -7,7 +7,7 @@ import { cloneRepository, cleanupRepository } from '../services/cloneService';
 import { scanDirectory } from '../services/scannerService';
 import { parseFile, ParsedFile } from '../parsers/astParser';
 import { generateGraphData } from '../graph/graphGenerator';
-import { chatWithRepo as aiChatWithRepo } from '../ai/geminiService';
+import { chatWithRepoStream as aiChatWithRepoStream } from '../ai/geminiService';
 import { getRelevantContext } from '../ai/contextRetriever';
 
 // ── Tech stack detection from URL heuristics ──────────────────────────────────
@@ -183,17 +183,29 @@ Recent Conversation History:
 ${historyContext}
 `;
 
-    const response = await aiChatWithRepo(message, contextContext);
+    const stream = await aiChatWithRepoStream(message, contextContext);
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    let fullResponse = '';
+    
+    for await (const chunk of stream) {
+      const text = chunk.text();
+      fullResponse += text;
+      res.write(`data: ${JSON.stringify({ text })}\n\n`);
+    }
 
     // Save assistant message to history
     await ChatHistory.create({
       user: req.user?.userId,
       repository: repo._id,
       role: 'assistant',
-      content: response
+      content: fullResponse
     });
 
-    res.status(200).json({ response });
+    res.end();
   } catch (error: any) {
     console.error('[chatWithRepo]', error);
     res.status(500).json({ error: error.message || 'Failed to process chat message' });

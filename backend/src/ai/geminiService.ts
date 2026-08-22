@@ -29,7 +29,7 @@ export const generateRepoSummary = async (repoName: string, techStack: string[],
   }
 };
 
-export const chatWithRepo = async (question: string, contextContext: string): Promise<string> => {
+export const chatWithRepoStream = async (question: string, contextContext: string): Promise<any> => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error("API_KEY_MISSING");
@@ -39,8 +39,8 @@ export const chatWithRepo = async (question: string, contextContext: string): Pr
     
     const prompt = `You are RepoLens AI, an intelligent coding assistant. Answer the user's question about their codebase using the context provided.\n\nContext:\n${contextContext}\n\nQuestion: ${question}\n\nAnswer concisely and accurately:`;
     
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    const result = await model.generateContentStream(prompt);
+    return result.stream;
   } catch (error: any) {
     const errorMsg = error?.message || '';
     const safeError = errorMsg.replace(process.env.GEMINI_API_KEY || '', '[HIDDEN_API_KEY]');

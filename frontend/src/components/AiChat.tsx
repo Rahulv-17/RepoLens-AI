@@ -106,19 +106,61 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
         body: JSON.stringify({ message: text.trim() }),
       });
 
-      const data = await res.json();
+      if (!res.ok) {
+        let errorMsg = 'Request failed';
+        try {
+          const errData = await res.json();
+          errorMsg = errData.error || errorMsg;
+        } catch (e) {}
+        throw new Error(errorMsg);
+      }
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: res.ok ? (data.response || data.message || 'Analysis complete.') : `Error: ${data.error || 'Request failed'}`,
+        content: '',
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, assistantMsg]);
-    } catch {
+
+      if (reader) {
+        let buffer = '';
+        let currentText = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split('\n\n');
+          
+          buffer = parts.pop() || '';
+          
+          for (const part of parts) {
+            if (part.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(part.slice(6));
+                if (data.text) {
+                  currentText += data.text;
+                  setMessages(prev => prev.map(msg => 
+                    msg.id === assistantMsg.id ? { ...msg, content: currentText } : msg
+                  ));
+                }
+              } catch (e) {
+                console.error('SSE parse error:', e);
+              }
+            }
+          }
+        }
+      }
+    } catch (err: any) {
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Unable to connect to the AI service. Please try again.',
+        content: `Error: ${err.message || 'Unable to connect to the AI service. Please try again.'}`,
         timestamp: new Date(),
       }]);
     } finally {
