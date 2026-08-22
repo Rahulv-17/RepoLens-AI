@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { motion } from 'framer-motion';
 import { ProfileModal } from './ProfileModal';
@@ -11,14 +11,8 @@ interface NavbarProps {
 }
 
 export function Navbar({ repoName }: NavbarProps) {
-  const { user, logout } = useAuthStore();
-  const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
 
   return (
     <>
