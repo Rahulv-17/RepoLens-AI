@@ -16,7 +16,7 @@ export function Navbar({ repoName }: NavbarProps) {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16"
+      <header className="fixed top-0 w-full z-50 flex items-center justify-between px-4 md:px-6 h-16"
         style={{
           background: 'rgba(13,21,21,0.6)',
           backdropFilter: 'blur(20px)',
@@ -40,13 +40,13 @@ export function Navbar({ repoName }: NavbarProps) {
           </Link>
 
           {repoName && (
-            <>
+            <div className="hidden md:flex items-center">
               <div className="h-4 w-px mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
-              <div className="flex items-center gap-2" style={{ color: '#849495', fontSize: '13px' }}>
+              <div className="flex items-center gap-2 ml-1" style={{ color: '#849495', fontSize: '13px' }}>
                 <span className="material-symbols-outlined text-sm">folder_open</span>
                 <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>{repoName}</span>
               </div>
-            </>
+            </div>
           )}
         </div>
 

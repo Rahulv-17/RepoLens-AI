@@ -81,7 +81,7 @@ export function LandingPage() {
 
       <main className="relative pt-16">
         {/* ══════════════════ HERO ══════════════════ */}
-        <section className="min-h-[88vh] flex flex-col items-center justify-center px-6 py-24 text-center">
+        <section className="min-h-[88vh] flex flex-col items-center justify-center px-4 md:px-6 py-16 md:py-24 text-center">
           {/* Badge */}
           <motion.div {...fadeUp(0.1)}
             className="mb-6 flex items-center gap-2 px-4 py-1.5 rounded-full"
@@ -189,7 +189,7 @@ export function LandingPage() {
         </section>
 
         {/* ══════════════════ BENTO FEATURE GRID ══════════════════ */}
-        <section className="px-6 py-24" style={{ maxWidth: '1440px', margin: '0 auto' }}>
+        <section className="px-4 md:px-6 py-16 md:py-24" style={{ maxWidth: '1440px', margin: '0 auto' }}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {features.map((f, i) => (
               <motion.div

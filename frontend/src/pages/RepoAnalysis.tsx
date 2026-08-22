@@ -22,6 +22,7 @@ export function RepoAnalysis() {
   const { token, user } = useAuthStore();
   const [repo, setRepo] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [activeSidebar, setActiveSidebar] = useState('explorer');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -150,6 +151,7 @@ export function RepoAnalysis() {
         </div>
 
         {/* Right actions */}
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden p-2 rounded-lg" style={{ color: '#00f0ff', background: 'rgba(0,240,255,0.1)' }}><span className="material-symbols-outlined">menu</span></button>
         <div className="flex items-center gap-3">
           <motion.button
             onClick={fetchRepo}
@@ -197,7 +199,7 @@ export function RepoAnalysis() {
       {/* ═══════════════════════════════════════════════════
           SIDEBAR
       ═══════════════════════════════════════════════════ */}
-      <aside className="fixed left-0 top-16 bottom-0 z-40 flex flex-col py-4"
+      <aside className={`fixed left-0 top-16 bottom-0 z-40 flex flex-col py-4 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
         style={{
           width: '256px',
           background: 'rgba(21,29,30,0.6)',
@@ -282,7 +284,7 @@ export function RepoAnalysis() {
       {/* ═══════════════════════════════════════════════════
           MAIN CONTENT
       ═══════════════════════════════════════════════════ */}
-      <main className="flex flex-col overflow-hidden" style={{ marginLeft: '256px', marginTop: '64px', flex: 1, minHeight: 0, minWidth: 0 }}>
+      <main className="flex flex-col overflow-hidden md:ml-[256px]" style={{ marginTop: '64px', flex: 1, minHeight: 0, minWidth: 0 }}>
 
         {/* ── Tab Content ── */}
         <div className="relative flex-1">
