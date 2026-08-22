@@ -26,9 +26,9 @@ export function Navbar({ repoName }: NavbarProps) {
         }}
       >
         <div className="flex items-center gap-3">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3 flex-shrink-0">
             <img src="/logo.png" alt="RepoLens AI Logo" className="h-8 w-auto object-contain rounded-lg" />
-            <span style={{
+            <span className="whitespace-nowrap" style={{
               fontFamily: 'Geist, sans-serif',
               fontWeight: 700,
               fontSize: '18px',

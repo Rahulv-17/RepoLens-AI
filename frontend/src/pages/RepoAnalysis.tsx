@@ -443,12 +443,12 @@ export function RepoAnalysis() {
               {activeTab === 'chat' && (
                 <div className="absolute inset-0 flex flex-col overflow-hidden">
                   {/* Chat toolbar */}
-                  <div className="flex items-center justify-between px-6 py-2.5 flex-shrink-0"
+                  <div className="flex flex-wrap items-center justify-between px-4 md:px-6 py-2.5 flex-shrink-0 gap-2"
                     style={{ background: 'rgba(21,29,30,0.4)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                     <div className="flex items-center gap-2 text-xs" style={{ color: '#849495' }}>
                       <span className="material-symbols-outlined text-sm">home</span>
                       <span>/</span>
-                      <span style={{ color: '#dce4e5' }}>{repo.repoName}</span>
+                      <span className="truncate max-w-[80px] sm:max-w-[150px]" style={{ color: '#dce4e5' }}>{repo.repoName}</span>
                       <span>/</span>
                       <span style={{ color: '#00f0ff' }}>chat-session</span>
                     </div>

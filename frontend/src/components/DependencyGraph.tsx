@@ -510,7 +510,7 @@ export function DependencyGraph({ graphData }: DependencyGraphProps) {
       </div>
 
       {/* ── Legend Panel ── */}
-      <div className="absolute bottom-6 left-6 z-20">
+      <div className="absolute bottom-6 left-6 z-20 hidden md:block">
         <div className="glass-panel-heavy rounded-2xl p-5 w-72 overflow-hidden">
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(to right, rgba(0,240,255,0.4), transparent)' }} />
         <div className="flex items-center justify-between mb-4">
@@ -561,8 +561,8 @@ export function DependencyGraph({ graphData }: DependencyGraphProps) {
       {selectedInfo && (
         <div className="absolute z-30" style={{ top: '24px', right: '24px' }}>
           <div
-            className="glass-panel-heavy rounded-3xl overflow-hidden"
-            style={{ width: '280px', border: '1px solid rgba(255,255,255,0.1)' }}
+            className="glass-panel-heavy rounded-3xl overflow-hidden w-[calc(100vw-48px)] sm:w-[280px]"
+            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
           >
           <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(0,240,255,0.5), rgba(208,188,255,0.3), transparent)' }} />
           <div className="p-5" style={{ background: 'rgba(35,43,44,0.5)' }}>
