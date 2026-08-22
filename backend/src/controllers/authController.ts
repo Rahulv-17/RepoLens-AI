@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ username, email, password: hashedPassword });
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '2h' });
     res.status(201).json({
       token,
       user: { id: user._id, username: user.username, email: user.email, profilePicture: user.profilePicture },
@@ -83,7 +83,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '2h' });
     res.status(200).json({
       token,
       user: { id: user._id, username: user.username, email: user.email, profilePicture: user.profilePicture },
@@ -150,7 +150,7 @@ export const googleAuth = async (req: Request, res: Response): Promise<void> => 
       });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '2h' });
     res.status(200).json({
       token,
       user: { id: user._id, username: user.username, email: user.email, profilePicture: user.profilePicture },
