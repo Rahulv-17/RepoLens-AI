@@ -38,7 +38,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/repos/${repoId}/chat`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/repos/${repoId}/chat`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
@@ -61,7 +61,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
 
   const clearHistory = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/repos/${repoId}/chat`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/repos/${repoId}/chat`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -99,7 +99,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
 
 
     try {
-      const res = await fetch(`http://localhost:5000/api/repos/${repoId}/chat`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/repos/${repoId}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ message: text.trim() }),

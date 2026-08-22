@@ -18,7 +18,7 @@ export function Dashboard() {
 
   const fetchRepos = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/repos', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/repos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -36,7 +36,7 @@ export function Dashboard() {
     setIsAnalyzing(true);
     setAnalyzeError('');
     try {
-      const res = await fetch('http://localhost:5000/api/repos/analyze', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/repos/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ repoUrl }),
@@ -59,7 +59,7 @@ export function Dashboard() {
     e.preventDefault();
     e.stopPropagation();
     try {
-      const res = await fetch(`http://localhost:5000/api/repos/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/repos/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

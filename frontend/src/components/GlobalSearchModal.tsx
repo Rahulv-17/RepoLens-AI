@@ -27,7 +27,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
 
   const fetchRepos = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/repos', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/repos`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
