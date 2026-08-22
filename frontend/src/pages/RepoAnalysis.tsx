@@ -107,26 +107,25 @@ export function RepoAnalysis() {
       {/* ═══════════════════════════════════════════════════
           FIXED HEADER
       ═══════════════════════════════════════════════════ */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16"
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-6 h-16"
         style={{
           background: 'rgba(13,21,21,0.5)',
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(255,255,255,0.07)',
         }}
       >
-        <div className="flex items-center gap-4">
-          {/* Logo */}
-          <Link to="/dashboard" className="flex items-center gap-2.5" style={{ textDecoration: 'none' }}>
+        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+          <Link to="/dashboard" className="flex items-center gap-2.5 flex-shrink-0" style={{ textDecoration: 'none' }}>
             <img src="/logo.png" alt="RepoLens AI Logo" className="h-7 w-auto object-contain rounded-md" />
-            <span style={{ fontFamily: 'Geist, sans-serif', fontWeight: 700, fontSize: '16px', color: '#00f0ff', letterSpacing: '-0.02em' }}>
+            <span className="whitespace-nowrap hidden sm:block" style={{ fontFamily: 'Geist, sans-serif', fontWeight: 700, fontSize: '16px', color: '#00f0ff', letterSpacing: '-0.02em' }}>
               RepoLens AI
             </span>
           </Link>
           <div className="h-4 w-px mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5" style={{ color: '#849495', fontSize: '13px', fontFamily: "'JetBrains Mono', monospace" }}>
-            <span className="material-symbols-outlined text-sm">folder_open</span>
-            <span>{repo.repoName}</span>
+            <span className="material-symbols-outlined text-sm flex-shrink-0">folder_open</span>
+            <span className="truncate max-w-[100px] md:max-w-none">{repo.repoName}</span>
           </div>
         </div>
 
@@ -151,8 +150,8 @@ export function RepoAnalysis() {
         </div>
 
         {/* Right actions */}
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden p-2 rounded-lg" style={{ color: '#00f0ff', background: 'rgba(0,240,255,0.1)' }}><span className="material-symbols-outlined">menu</span></button>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden p-2 rounded-lg flex items-center justify-center" style={{ color: '#00f0ff', background: 'rgba(0,240,255,0.1)' }}><span className="material-symbols-outlined text-xl">menu</span></button>
           <motion.button
             onClick={fetchRepo}
             whileHover={{ scale: 1.02, boxShadow: '0 0 15px rgba(0,240,255,0.3)' }}
