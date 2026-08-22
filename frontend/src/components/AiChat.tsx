@@ -33,7 +33,7 @@ export function AiChat({ repoId, repoName, token }: AiChatProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' });
   }, [messages, isStreaming]);
 
   useEffect(() => {
