@@ -2,6 +2,8 @@
 
 > AI-powered repository intelligence platform that helps developers understand, visualize, and explore codebases faster.
 
+**🌐 Live Demo:** [https://repolens.rahulvaddi.me](https://repolens.rahulvaddi.me)
+
 # 🚀 Overview
 
 RepoLens AI is a full-stack developer tool that analyzes GitHub repositories and transforms complex codebases into understandable visual and AI-powered insights.
@@ -33,9 +35,12 @@ The goal is simple:
 # 2. User Authentication
 
 * User signup and login
+* **Google OAuth 2.0 Integration**
 * JWT-based authentication
 * Password hashing using bcrypt
+* **Forgot Password / Password Reset functionality via Email**
 * Protected dashboard routes
+* User profile management
 
 # 3. AST-Based Repository Analysis
 
@@ -127,6 +132,7 @@ Features:
 * File previews
 * Important file highlighting
 * Folder explanations
+* **Global Search functionality**
 
 # 7. Dependency Graph Visualization
 
@@ -200,255 +206,70 @@ Generate repository insights such as:
 # 1. Landing Page (`/`)
 
 ## Purpose
-
 Introduce the platform and allow users to analyze repositories quickly.
 
-## Sections
-
-### Hero Section
-
-* Large headline
-* Short project description
-* GitHub repository URL input
-* Analyze button
-
-### Feature Showcase
-
-Cards for:
-
-* AI Repository Chat
-* Dependency Graphs
-* Repository Summaries
-* AST-Based Analysis
-
-### Demo Preview
-
-* Graph preview
-* Chat UI preview
-* File explorer preview
-
-### How It Works
-
-Simple workflow:
-
-1. Paste GitHub URL
-2. Repository gets analyzed
-3. AST parsing extracts dependencies
-4. Graph & insights generated
-5. Ask AI questions
-
-### Footer
-
-* GitHub link
-* About section
-* Contact section
-
-# 2. Login Page (`/login`)
+# 2. Authentication Pages (`/login`, `/signup`, `/forgot-password`, `/reset-password`)
 
 ## Components
+* Traditional Email/Password Auth
+* Google "One-Tap" Login Integration
+* Secure Password Reset Flow
 
-* Email input
-* Password input
-* Login button
-* Signup redirect link
-
-# 3. Signup Page (`/signup`)
-
-## Components
-
-* Username input
-* Email input
-* Password input
-* Confirm password input
-* Create account button
-
-# 4. Dashboard Page (`/dashboard`)
-
-## Purpose
-
-Main user workspace.
+# 3. Dashboard Page (`/dashboard`)
 
 ## Layout
+* Sidebar with settings, profiles, and repositories
+* Welcome Section
+* Analyze Repository Card
+* Recent Repositories Section
 
-### Sidebar
-
-* Dashboard
-* Repositories
-* Settings
-* Logout
-
-### Main Content
-
-#### Welcome Section
-
-```txt
-Welcome back Rahul 👋
-```
-
-#### Analyze Repository Card
-
-* GitHub repository URL input
-* Analyze button
-
-#### Recent Repositories Section
-
-Repository cards displaying:
-
-* Repository name
-* Tech stack
-* Last analyzed date
-
-Example:
-
-```txt
-Repo: Ecommerce-App
-Stack: MERN
-Files: 214
-```
-
-# 5. Repository Analysis Page (`/repo/:id`)
-
-## Purpose
-
-Core repository exploration workspace.
+# 4. Repository Analysis Page (`/repo/:id`)
 
 ## Layout
+* **Left Sidebar**: Repository File Explorer
+* **Top Navbar**: Global Search, Repository Name
+* **Main Area Tabs**:
+  * **Tab 1 — Overview**: AI Summary, Tech Stack, Stats
+  * **Tab 2 — Dependency Graph**: Interactive Flow Graph
+  * **Tab 3 — AI Chat**: Repository-aware AI Assistant
+  * **Tab 4 — Complexity Insights**: Largest files, circular dependencies
 
-```txt
-Top Navbar
---------------------------------
-Sidebar | Main Analysis Area
---------------------------------
-```
-
-## Left Sidebar
-
-### Repository File Explorer
-
-Features:
-
-* Expand/collapse folders
-* Click files
-* Highlight important files
-
-Example:
-
-```txt
-src/
- ├── components/
- ├── auth/
- ├── services/
- └── utils/
-```
-
-## Top Navbar
-
-* Repository name
-* File search
-* Refresh analysis button
-
-## Main Analysis Tabs
-
-## Tab 1 — Overview
-
-### Includes
-
-* AI repository summary
-* Tech stack badges
-* Important files
-* Repository statistics
-
-### Statistics
-
-* Total files
-* Total folders
-* Dependency count
-
-## Tab 2 — Dependency Graph
-
-### Features
-
-* Interactive graph
-* AST-generated relationships
-* Zoom & pan
-* Clickable nodes
-* Module relationships
-
-Example:
-
-```txt
-AuthController
-      ↓
-AuthService
-      ↓
-Database
-```
-
-## Tab 3 — AI Chat
-
-### Features
-
-* Chat interface
-* Repository-aware responses
-* Suggested prompts
-
-Example prompts:
-
-* Where is authentication implemented?
-* Explain login flow
-* Which files connect to MongoDB?
-
-## Tab 4 — Complexity Insights
-
-### Includes
-
-* Largest files
-* Most imported modules
-* Deeply nested folders
-* Circular dependencies
-
-Example:
-
-```txt
-authController.js → 540 lines
-database.js used in 14 modules
-```
-
-# 6. Settings Page (`/settings`)
+# 5. Settings & Profile
 
 ## Features
-
-* Update profile
+* Update profile picture and username
 * Dark/light theme toggle
-* Logout
-* Delete account
+* Account management
 
 # 🛠️ Final Tech Stack
 
 # Frontend
 
-* React
+* React (Vite)
 * Tailwind CSS
 * React Router
 * React Flow
+* Framer Motion
+* Zustand (State Management)
 
 # Backend
 
 * Node.js
 * Express.js
+* TypeScript
 
 # Database
 
-* MongoDB Atlas (Free Tier)
+* MongoDB Atlas 
 
 # AI
 
-* Google Gemini API (Free)
+* Google Gemini API 
 
 # Authentication
 
-* JWT
-* bcrypt
+* JWT & bcrypt
+* Google OAuth 2.0 Client
 
 # AST Parsing
 
@@ -456,8 +277,8 @@ database.js used in 14 modules
 
 # Deployment
 
-* Vercel (Frontend)
-* Render (Backend)
+* **Frontend**: Vercel (Custom Domain connected via Namecheap)
+* **Backend**: Render Web Services
 
 # 🗄️ Database Collections
 
@@ -467,7 +288,9 @@ database.js used in 14 modules
 {
   "username": "Rahul",
   "email": "rahul@gmail.com",
-  "password": "hashedPassword"
+  "password": "hashedPassword",
+  "profilePicture": "https://...",
+  "googleId": "..."
 }
 ```
 
@@ -499,7 +322,7 @@ database.js used in 14 modules
 ```txt
 Frontend (React + Tailwind)
         ↓
-Backend API Server
+Backend API Server (Render)
         ↓
 Repository Cloning Service
         ↓
@@ -516,20 +339,6 @@ AI Context Builder
 Gemini API
         ↓
 Repository Chat & Insights
-```
-
-# ⚡ Suggested Build Order
-
-```txt
-1. Authentication
-2. Dashboard UI
-3. GitHub Repository Import
-4. Repository Scanner
-5. AST Parsing
-6. Dependency Graph
-7. AI Repository Summary
-8. AI Chat
-9. Complexity Insights
 ```
 
 # 🎯 Real-World Use Cases
