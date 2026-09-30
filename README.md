@@ -1,8 +1,9 @@
+can u give for the repolens project as well below was my current readme :
 # RepoLens AI
 
 > AI-powered repository intelligence platform that helps developers understand, visualize, and explore codebases faster.
 
-**🌐 Live Demo:** [https://repolens.rahulvaddi.me](https://repolens.rahulvaddi.me)
+**🌐 Live Demo:** [https://repolens.rahulvaddi.me]
 
 # 🚀 Overview
 
